@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/hacktothefuture/narcissus#readme",
   "dependencies": {
+    "async": "^1.4.2",
     "express": "^4.13.3",
     "request": "^2.62.0"
   }
