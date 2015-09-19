@@ -16,29 +16,32 @@
         <form>
           <div class="form-group">
             <label>Location</label>
-            <input type="text" placeholder="Where do you live?">
+            <input type="text" placeholder="Where will you fly from?" id="location">
+            <select class="form-control" id="airport">
+              <option value="" disabled selected>Airport</option>
+            </select>
           </div>
           
           <div class="form-group">
             <label>Depart</label>
-            <input type="date">
+            <input type="date" id="departure-date">
             <label>Return</label>
-            <input type="date">
+            <input type="date" id="return-date">
           </div>
           
           <div class="form-group">
             <label>Budget</label>
-            <input type="text" placeholder="What's your maximum budget?">
+            <input type="text" placeholder="What's your budget?" id="budget">
           </div>
           
-          <button type="button" class="btn btn-default">Find Trips</button>
+          <button type="button" class="btn btn-default" id="btn-find-trips">Find Trips</button>
         </form>
       </div>
     </div>
   </div>
   
   <div class="container">
-    <ul class="list-group">
+    <ul class="list-group" id="results-group">
       <li class="list-group-item">
         <div class="row">
           <div class="col-xs-2">
@@ -56,6 +59,7 @@
   <!-- Javascript goes here for fast page loading -->
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/app.js"></script>
 </body>
 
 </html>
