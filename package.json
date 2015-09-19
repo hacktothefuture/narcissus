@@ -1,0 +1,22 @@
+{
+  "name": "narcissus",
+  "version": "1.0.0",
+  "description": "Maximize your dollars spent on travel per instagram like.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hacktothefuture/narcissus.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/hacktothefuture/narcissus/issues"
+  },
+  "homepage": "https://github.com/hacktothefuture/narcissus#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
