@@ -12,7 +12,52 @@ function getOptimalTrip(userParams){
 
 //Grab Locations from Amadeus API
 function getLocationsByBudget(userParams){
-
+    /*console.log("http://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?" +
+     "origin=" + userParams.origin +
+     "&departure_date=" + userParams.departure_date +
+     "&duration=" + userParams.duration +
+     "&max_price=" + userParams.max_price +
+     "&apikey=" + AMADEUS_KEY);
+     */
+    request("http://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?" +
+            "origin=" + userParams.origin +
+            "&departure_date=" + userParams.departure_date +
+            "&duration=" + userParams.duration +
+            "&max_price=" + userParams.max_price +
+            "&apikey=" + AMADEUS_KEY,
+            function(err, response, body){
+            getCitiesFromAirports(body, 0);
+            console.log(body);
+            });
+    
+    
+}
+​
+function getCitiesFromAirports(amadeus_params, index){
+    
+    //console.log("===========\n" + amadeus_params + "\n=============");
+    //console.log("///////////\n" + JSON.stringify(JSON.parse(amadeus_params).results[0]) + "\n////////////\n");
+    
+    var iata_code = JSON.parse(amadeus_params).results[index].destination;
+    
+    request("https://api.sandbox.amadeus.com/v1.2/" +
+            "location/" + iata_code +
+            "?apikey=" + AMADEUS_KEY,
+            function(error, resp, body){
+                //amadeus_params.results[index].city = body.city;
+                
+                index++;
+                if(index == JSON.parse(amadeus_params).results.length){
+                //END
+                //console.log(amadeus_params);
+                }
+                else{
+                //continue
+                //console.log(body);
+                    getCitiesFromAirports(amadeus_params, index);
+                }
+            });
+    
 }
 
 
