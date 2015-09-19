@@ -1,3 +1,8 @@
+var request = require('request');
+var INSTAGRAM_ACCESS_TOKEN = "2203667027.0b2763d.0855e602c01c4de49ab037f52f771ad1";
+var blah = 0;
+
+
 //Main function to be called by frontend
 function getOptimalTrip(userParams){
 	var locations = getLocationsByBudget(userParams);
@@ -28,4 +33,13 @@ function postsToScore(location, posts){
 	var normalizedLikes = totalLikes/postsWithoutOutliers.length;
 	location.score = normalizedLikes;
 	return location;
+
+function getRecentPostsByTag(tagName, cb) {
+	var accessToken = ACCESS_TOKEN;
+	var url = "https://api.instagram.com/v1/tags/"
+	+ tagName + "/media/recent?access_token=" + accessToken;
+	request(url, function(error, response, body) {
+	  	console.log("Status code: " + response.statusCode);
+	  	cb(JSON.parse(body));
+	});
 }
