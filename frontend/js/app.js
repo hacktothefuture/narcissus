@@ -14,6 +14,7 @@ function findTrips() {
     var budget = $("#budget").val();
 
     var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, function(data) {
+        makeTable(data);
         drawMapStuff(data);
     });
 }
