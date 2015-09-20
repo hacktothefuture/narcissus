@@ -1,5 +1,12 @@
 var AMADEUS_KEY = "Q76ryFVSqb5BE6pmBJw9YJtuWsSufclH";
 
+var sortingAlgorithms = {
+    "likes": function(a,b) { return b.score - a.score},
+    "likes per dollar": function(a,b) { return a.ratio - b.ratio}
+};
+
+
+
 function findAirports(search, response) {
     $.ajax({
         url: "http://api.sandbox.amadeus.com/v1.2/airports/autocomplete?apikey=" + AMADEUS_KEY +"&term=" + search,
@@ -19,13 +26,25 @@ function findTrips() {
 
     var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, 
         function(data) {
+            /*data.locations_with_scores = */data.locations_with_scores.forEach(function(location) {
+                location.ratio = location.price / location.score;
+            });
             //alert("data: " + JSON.stringify(data));
+
             $("#loading-small").hide();
+
+            $('#sorting').change( function() {
+                var sortingLabel = $('#sorting option:selected').val();
+                data.locations_with_scores = data.locations_with_scores.sort(sortingAlgorithms[sortingLabel]);
+                makeTable(data);
+            });
+
             makeTable(data);
             drawMapStuff(data);
             $('html, body').animate({
                 scrollTop: $("#map").offset().top
             }, 2000);
+
         });
     //alert("response: " + JSON.stringify(response));
 }
