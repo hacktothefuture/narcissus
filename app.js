@@ -65,6 +65,9 @@ function getUserParams(req) {
 //Main function to be called by frontend
 function getOptimalTrip(userParams, sendTopLocations) {
     getLocationsByBudget(userParams, function(amadeus_params) {
+        if(amadeus_params == undefined){
+            return;
+        }
         console.log(amadeus_params.results);
         amadeus_params.results = amadeus_params.results.filter(function(x) {
             return x.hasOwnProperty('name');
