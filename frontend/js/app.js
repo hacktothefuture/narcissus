@@ -13,18 +13,21 @@ function findTrips() {
     var departureDate = $("#departure-date").val();
     var budget = $("#budget").val();
 
-    var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, function(data) {
-        makeTable(data);
-        drawMapStuff(data);
-    });
+    var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, 
+        function(data) {
+            alert("data: " JSON.stringify(data));
+            makeTable(data);
+            drawMapStuff(data);
+        });
+    alert("response: " + JSON.stringify(response));
 }
 
 function makeTable(data){
     $("#list-results").empty();
     
     var locations = data.locations_with_scores;
-    
     for( var i = 0; i < locations.length; i++ ) {
+        alert(JSON.stringify(locations[i]));
         var item = locations[i];
         $("#list-results").append("<li class='list-group-item'><h2>" + item.name.replace(/([A-Z])/g, ' $1') + "</h2><h3>$" + item.price + "</h3><h3>" + parseInt(item.score, 10) + "</h3></li>");
     }
