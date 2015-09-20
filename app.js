@@ -10,7 +10,7 @@ var app = express();
 var INSTAGRAM_ACCESS_TOKEN = "2203667027.0b2763d.0855e602c01c4de49ab037f52f771ad1";
 var AMADEUS_KEY = "Q76ryFVSqb5BE6pmBJw9YJtuWsSufclH";
 var MAX_ID;
-var blah = 0;
+
 app.get('/node/findtrip', function(req, resp) {
     var userParams = getUserParams(req);
     function sendTopLocations(locationsWithScores) {
@@ -198,13 +198,13 @@ function getRecentPostsByTag(tagName, returnPosts) {
 }
 
 //Given tag name, return JSON list of recent posts with that tag
-function getTagIdForDate(unixTimestamp, returnPosts) {
+function getTagIdForDate(unixTimeStamp, returnPosts) {
     console.log("LOGAN");
     var accessToken = INSTAGRAM_ACCESS_TOKEN;
 
 
     var url =  util.format("https://api.instagram.com/v1/media/search?lat=%d&lng=%d&count=1&access_token=%s&max_timestamp=%s", 
-                            40.7127, -74.0059, INSTAGRAM_ACCESS_TOKEN, unixTimestamp.toString());
+                            40.7127, -74.0059, INSTAGRAM_ACCESS_TOKEN, unixTimeStamp.toString());
     console.log(url);
     request(url, function(err, res, body) {
         if (err || res.statusCode != 200) {
@@ -214,7 +214,15 @@ function getTagIdForDate(unixTimestamp, returnPosts) {
         }
         console.log("Status code: " + res.statusCode);
         console.log(err);
-        returnPosts(null, JSON.parse(body)['data'][0]['id']);
+        var data = JSON.parse(body)['data'];
+        console.log(data);
+        console.log(data.length);
+        if(data.length == 0){
+            console.log("Unsuccessful search, check hour later")
+            return getTagIdForDate(unixTimeStamp+3600, returnPosts);
+        }
+
+        returnPosts(null, data[0]['id']);
     });
 }
 
