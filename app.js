@@ -7,7 +7,7 @@ var app = express();
 var INSTAGRAM_ACCESS_TOKEN = "2203667027.0b2763d.0855e602c01c4de49ab037f52f771ad1";
 var AMADEUS_KEY = "Q76ryFVSqb5BE6pmBJw9YJtuWsSufclH";
 var blah = 0;
-app.get('/findtrip', function(request, response) {
+app.get('/req/findtrip', function(request, response) {
     var userParams = getUserParams(request);
     function sendTopLocations(locationsWithScores) {
         response.send(locationsWithScores);
