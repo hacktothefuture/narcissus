@@ -18,6 +18,9 @@ function findTrips() {
             //alert("data: " + JSON.stringify(data));
             makeTable(data);
             drawMapStuff(data);
+            $('html, body').animate({
+                scrollTop: $("#map").offset().top
+            }, 2000);
         });
     //alert("response: " + JSON.stringify(response));
 }
@@ -29,7 +32,7 @@ function makeTable(data){
     for( var i = 0; i < locations.length; i++ ) {
         //alert(JSON.stringify(locations[i]));
         var item = locations[i];
-        $("#list-results").append("<li class='list-group-item'><h2>" + item.name.replace(/([A-Z])/g, ' $1') + "</h2><h3>$" + item.price + "</h3><h3>" + parseInt(item.score, 10) + "</h3></li>");
+        $("#list-results").append("<li class='list-group-item'><div class='row'><div class='col-md-4'><h2>" + item.name.replace(/([A-Z])/g, ' $1') + "</h2><h3>" + item.country + "</h3></div><div class='col-md-4'><h4>$" + item.price + "</h4><h4><span class='glyphicon glyphicon-thumbs-up'></span>" + parseInt(item.score, 10) + "</h4></div></div></li>");
     }
 }
 
