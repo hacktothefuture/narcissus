@@ -8,6 +8,16 @@ function findAirports(search, response) {
     });
 }
 
+function findTrips() {
+    var location = $("#location").val();
+    var departureDate = $("#departure-date").val();
+    var budget = $("#budget").val();
+
+    var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, function(data) {
+        alert(data);
+    });
+}
+
 $( document ).ready(function() {
     // Bind event handlers
     $("#location").autocomplete({
@@ -15,4 +25,6 @@ $( document ).ready(function() {
             findAirports(request.term, response);
         }
     });
+    
+    $("#btn-find-trips").click(findTrips);
 });
