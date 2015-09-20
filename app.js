@@ -1,6 +1,7 @@
 var request = require('request');
 var async = require('async');
 var express = require('express');
+var util = require('util');
 var app = express();
 
 var INSTAGRAM_ACCESS_TOKEN = "2203667027.0b2763d.0855e602c01c4de49ab037f52f771ad1";
@@ -76,27 +77,29 @@ function getCitiesFromAirports(amadeus_params, index, finishCityRetrieval){
     //console.log("===========\n" + amadeus_params + "\n=============");
     //console.log("///////////\n" + JSON.stringify(JSON.parse(amadeus_params).results[0]) + "\n////////////\n");
     //console.log(JSON.stringify(amadeus_params));
-    var iata_code = amadeus_params.results[index].destination;
-    
-    request("https://api.sandbox.amadeus.com/v1.2/" +
-            "location/" + iata_code +
-            "?apikey=" + AMADEUS_KEY,
-            function(error, resp, body){
-                console.log("HEEBYJEEBY");
-                //console.log(body);
-                amadeus_params.results[index].name = JSON.parse(body).airports[0].city_name;
-            
-                index++;
-                if(index == amadeus_params.results.length){
-                    finishCityRetrieval();
-                }
-                else{
-                    //continue
-                    //console.log(body);
-                    getCitiesFromAirports(amadeus_params, index, finishCityRetrieval);
-                }
-            });
-    
+
+    async.map(amadeus_params.results, function(result, next) {
+    	getCity(result, next);
+    }, finishCityRetrieval);    
+}
+
+function getCity(result, callback) {
+	console.log("YELP");
+	var iata_code = result.destination;
+	request({
+		url: util.format('https://api.sandbox.amadeus.com/v1.2/location/%s?apikey=%s',
+			iata_code, AMADEUS_KEY)
+	}, function (err, res, body) {
+		if (err || res.statusCode != 200) {
+			console.log("OH GEE");
+			console.log(err);
+			console.log("" + res.statusCode);
+			return callback(err);
+		}
+		console.log("NAME IS " + JSON.parse(body).airports[0].city_name);
+		result.name = JSON.parse(body).airports[0].city_name;
+		callback(null, result);
+	});
 }
 
 //Calculate instagram scores for a location
@@ -117,7 +120,6 @@ function calculateLocationScore(location, returnLocationWithScore) {
     });
 }
 
-
 //Given tag name, return JSON list of recent posts with that tag
 function getRecentPostsByTag(tagName, returnPosts) {
     console.log("CONNOR");
@@ -130,5 +132,18 @@ function getRecentPostsByTag(tagName, returnPosts) {
         console.log(error);
         returnPosts(JSON.parse(body)['data']);
     });
+}
 
+//Given tag name, return JSON list of recent posts with that tag
+function getTagIdForDate(unixTimestamp, returnPosts) {
+    console.log("CONNOR");
+    var accessToken = INSTAGRAM_ACCESS_TOKEN;
+    var url = "https://api.instagram.com/v1/tags/"
+    + encodeURI(tagName) + "/media/recent?access_token=" + accessToken;
+    console.log(url);
+    request(url, function(error, response, body) {
+        console.log("Status code: " + response.statusCode);
+        console.log(error);
+        returnPosts(JSON.parse(body)['data']);
+    });
 }
