@@ -15,11 +15,11 @@ function findTrips() {
 
     var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, 
         function(data) {
-            alert("data: " JSON.stringify(data));
+            //alert("data: " + JSON.stringify(data));
             makeTable(data);
             drawMapStuff(data);
         });
-    alert("response: " + JSON.stringify(response));
+    //alert("response: " + JSON.stringify(response));
 }
 
 function makeTable(data){
@@ -27,7 +27,7 @@ function makeTable(data){
     
     var locations = data.locations_with_scores;
     for( var i = 0; i < locations.length; i++ ) {
-        alert(JSON.stringify(locations[i]));
+        //alert(JSON.stringify(locations[i]));
         var item = locations[i];
         $("#list-results").append("<li class='list-group-item'><h2>" + item.name.replace(/([A-Z])/g, ' $1') + "</h2><h3>$" + item.price + "</h3><h3>" + parseInt(item.score, 10) + "</h3></li>");
     }
@@ -44,7 +44,7 @@ function drawMapStuff(data){
     
     data = data.locations_with_scores;
     for(var i=0; i < data.length;i++){
-        alert(JSON.stringify(data[i]));
+        //alert(JSON.stringify(data[i]));
         var coords = [{lat: dep_lat, lng: dep_lon}, {lat: data[i].lat, lng: data[i].lng}];
         
         var flightPath = new google.maps.Polyline({
