@@ -148,4 +148,6 @@ function getTagIdForDate(unixTimestamp, returnPosts) {
     });
 }
 
-app.listen(80);
+var server = app.listen(80, function() {
+    console.log("Listening on port 80...");
+});
