@@ -4,6 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>narcissus</title>
+  <style type="text/css">
+      html, body { height: 100%; margin: 0; padding: 0; }
+      #map { height: 100%; }
+  </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -54,7 +58,22 @@
       </li>
     </ul>
   </div>
+  <div class="container" id="map"></div>
+  <script type="text/javascript">
+      
+      var map;
+      function initMap() {
+          map = new google.maps.Map(document.getElementById('map'), {
+                                    center: {lat: -34.397, lng: 150.644},
+                                    zoom: 8
+                                    });
+      }
   
+      </script>
+  <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy8zhdADDLM866ndDlipqReLOqqgfqNv0&callback=initMap">
+      </script>
+</body>
   <!-- Javascript goes here for fast page loading -->
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
