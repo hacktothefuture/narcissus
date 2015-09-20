@@ -44,23 +44,36 @@ function drawMapStuff(data){
     */
     var dep_lon = data.departure_lon;
     var dep_lat = data.departure_lat;
+
+    map.setCenter({lat: dep_lat, lng: dep_lon});
     
     data = data.locations_with_scores;
+    
+    var bounds = new google.maps.LatLngBounds();
+
+    bounds.extend(new google.maps.LatLng(dep_lat, dep_lon));
+
     for(var i=0; i < data.length;i++){
         //alert(JSON.stringify(data[i]));
-        var coords = [{lat: dep_lat, lng: dep_lon}, {lat: data[i].lat, lng: data[i].lng}];
-        
+        var path_coords = [{lat: dep_lat, lng: dep_lon}, {lat: data[i].lat, lng: data[i].lng}];
+
+        bounds.extend(new google.maps.LatLng(data[i].lat, data[i].lng));
+
         var flightPath = new google.maps.Polyline({
-                                                  path: coords,
+                                                  path: path_coords,
                                                   geodesic: true,
                                                   strokeColor: '#FF0000',
                                                   strokeOpacity: 1.0,
                                                   strokeWeight: 2
                                                   });
-        
-        flightPath.setMap(map);
-        //flights.push(flightPath);
+    
+
     }
+
+    map.fitBounds(bounds);
+
+    flightPath.setMap(map);
+    //flights.push(flightPath);
 }
 
 $( document ).ready(function() {
