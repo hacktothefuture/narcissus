@@ -22,10 +22,19 @@ function makeTable(data){
 
 }
 
+//var flights = [];
 function drawMapStuff(data){
+    /*for(var i=0; i < flights.length; i--){
+        flights.pop().setMap(null);
+    }
+    */
+    var dep_lon = data.departure_lon;
+    var dep_lat = data.departure_lat;
+    
+    data = data.locations_with_scores;
     for(var i=0; i < data.length;i++){
         alert(JSON.stringify(data[i]));
-        var coords = [{lat: 0, lng: -180}, {lat: data[i].lat, lng: data[i].lng}];
+        var coords = [{lat: dep_lat, lng: dep_lon}, {lat: data[i].lat, lng: data[i].lng}];
         
         var flightPath = new google.maps.Polyline({
                                                   path: coords,
@@ -36,6 +45,7 @@ function drawMapStuff(data){
                                                   });
         
         flightPath.setMap(map);
+        //flights.push(flightPath);
     }
 }
 
