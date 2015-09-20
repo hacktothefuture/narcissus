@@ -23,7 +23,7 @@ function testfn() {
     var userParams = {
         'departure_location' : "BOS",
         'depart_date' : "2015-09-20",
-        'budget' : "200"
+        'budget' : "600"
     };
     function cb(locationsWithScores) {
         console.log("HERE WE GO");
@@ -46,6 +46,9 @@ function getUserParams(request) {
 function getOptimalTrip(userParams, sendTopLocations) {
     getLocationsByBudget(userParams, function(amadeus_params) {
         console.log(amadeus_params.results);
+        amadeus_params.results = amadeus_params.results.filter(function(x) {
+            return x.hasOwnProperty('name');
+        })
         async.map(amadeus_params.results, calculateLocationScore,
             function(err, locationsWithScores) {
                 console.log(err);
@@ -66,6 +69,7 @@ function getLocationsByBudget(userParams, returnLocations){
                 "&departure_date=" + userParams.depart_date +
                 // "&duration=" + userParams.duration +
                 "&max_price=" + userParams.budget +
+                "&aggregation_mode=COUNTRY" +
                 "&apikey=" + AMADEUS_KEY,
             function(err, response, body){
                 console.log("EEPEPP");
@@ -79,9 +83,6 @@ function getLocationsByBudget(userParams, returnLocations){
 
 function getCitiesFromAirports(amadeus_params, index, finishCityRetrieval){
     console.log("GUNS");
-    //console.log("===========\n" + amadeus_params + "\n=============");
-    //console.log("///////////\n" + JSON.stringify(JSON.parse(amadeus_params).results[0]) + "\n////////////\n");
-    //console.log(JSON.stringify(amadeus_params));
 
     async.map(amadeus_params.results, function(result, next) {
     	getCity(result, next);
@@ -101,8 +102,11 @@ function getCity(result, callback) {
 			console.log("" + res.statusCode);
 			return callback(err);
 		}
+        var cityData = JSON.parse(body);
 		console.log("NAME IS " + JSON.parse(body).airports[0].city_name);
-		result.name = JSON.parse(body).airports[0].city_name;
+		result.name = cityData.airports[0].city_name.replace(/\s+/g, '');
+        result.lat = cityData.airports[0].location.latitude;
+        result.lng = cityData.airports[0].location.longitude;
 		callback(null, result);
 	});
 }
@@ -110,49 +114,61 @@ function getCity(result, callback) {
 //Calculate instagram scores for a location
 function calculateLocationScore(location, returnLocationWithScore) {
     console.log("BUTTS");
-    getRecentPostsByTag(location.name, function(posts) {
-        var sortedPosts = posts.sort(function(a,b) { return b.likes.count - a.likes.count; });
-        var postsWithoutOutliers = sortedPosts.splice(Math.floor(sortedPosts.length/10), 
-                                                      Math.ceil(sortedPosts.length*9/10));
-        var totalLikes = 0;
-        for(var i = 0; i < postsWithoutOutliers.length; i++){
-            totalLikes += postsWithoutOutliers[i].likes.count;
-        }
-        var normalizedLikes = totalLikes/postsWithoutOutliers.length;
-        location.score = normalizedLikes;
-        console.log(location);
-        returnLocationWithScore(null, location)
+    var unixTimeStamp = Date.parse(location.departure_date)/1000 - (365*24*3600)+1;
+    getTagIdForDate(unixTimeStamp, function(err, maxTagId) {
+        getRecentPostsByTag(location.name, maxTagId, function(err, posts) {
+            var sortedPosts = posts.sort(function(a,b) { return b.likes.count - a.likes.count; });
+            var postsWithoutOutliers = sortedPosts.splice(Math.floor(sortedPosts.length/10), 
+                                                          Math.ceil(sortedPosts.length*9/10));
+            var totalLikes = 0;
+            for(var i = 0; i < postsWithoutOutliers.length; i++){
+                totalLikes += postsWithoutOutliers[i].likes.count;
+            }
+            var normalizedLikes = totalLikes/postsWithoutOutliers.length;
+            location.score = normalizedLikes;
+            console.log(location);
+            returnLocationWithScore(null, location)
+        });
     });
 }
 
 //Given tag name, return JSON list of recent posts with that tag
-function getRecentPostsByTag(tagName, returnPosts) {
+function getRecentPostsByTag(tagName, maxTagId, returnPosts) {
     console.log("CONNOR");
     var accessToken = INSTAGRAM_ACCESS_TOKEN;
     var url = "https://api.instagram.com/v1/tags/"
-    + encodeURI(tagName) + "/media/recent?access_token=" + accessToken;
+    + encodeURI(tagName) + "/media/recent?access_token=" + accessToken+"&max_tag_id="+maxTagId.substr(0, maxTagId.indexOf('_')) + "&count=33";
     console.log(url);
-    request(url, function(error, response, body) {
-        console.log("Status code: " + response.statusCode);
-        console.log(error);
-        returnPosts(JSON.parse(body)['data']);
+    request(url, function(err, res, body) {
+        if (err || res.statusCode != 200) {
+            console.log("Status code: " + res.statusCode);
+            console.log(body);
+            return returnPosts(err);
+        }
+        returnPosts(null, JSON.parse(body)['data']);
     });
 }
 
 //Given tag name, return JSON list of recent posts with that tag
 function getTagIdForDate(unixTimestamp, returnPosts) {
-    console.log("CONNOR");
+    console.log("LOGAN");
     var accessToken = INSTAGRAM_ACCESS_TOKEN;
-    var url = "https://api.instagram.com/v1/tags/"
-    + encodeURI(tagName) + "/media/recent?access_token=" + accessToken;
+
+
+    var url =   util.format("https://api.instagram.com/v1/media/search?lat=%d&lng=%d&count=1&access_token=%s&max_timestamp=%s", 
+                            40.7127, -74.0059, INSTAGRAM_ACCESS_TOKEN, unixTimestamp.toString());
     console.log(url);
-    request(url, function(error, response, body) {
-        console.log("Status code: " + response.statusCode);
-        console.log(error);
-        returnPosts(JSON.parse(body)['data']);
+    request(url, function(err, res, body) {
+        if (err || res.statusCode != 200) {
+           console.log("Status code: " + res.statusCode);
+            console.log(body);
+            return returnPosts(err);
+        }
+        console.log("Status code: " + res.statusCode);
+        console.log(err);
+        returnPosts(null, JSON.parse(body)['data'][0]['id']);
     });
 }
-
 var server = app.listen(2020, function() {
     console.log("Listening on port 2020...");
 });
