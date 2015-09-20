@@ -19,6 +19,7 @@
   "dependencies": {
     "async": "^1.4.2",
     "express": "^4.13.3",
-    "request": "^2.62.0"
+    "request": "^2.62.0",
+    "country-data": "0.0.23"
   }
 }
