@@ -2,7 +2,9 @@ var AMADEUS_KEY = "Q76ryFVSqb5BE6pmBJw9YJtuWsSufclH";
 
 var sortingAlgorithms = {
     "likes": function(a,b) { return b.score - a.score},
-    "likes per dollar": function(a,b) { return a.ratio - b.ratio}
+    "likes per dollar": function(a,b) { return a.ratio - b.ratio},
+    "highest price": function(a,b) { return b.price - a.price},
+    "lowest price": function(a,b) { return a.price - b.price}
 };
 
 
