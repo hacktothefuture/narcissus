@@ -147,3 +147,5 @@ function getTagIdForDate(unixTimestamp, returnPosts) {
         returnPosts(JSON.parse(body)['data']);
     });
 }
+
+app.listen(80);
