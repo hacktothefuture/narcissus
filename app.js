@@ -2,6 +2,7 @@ var request = require('request');
 var async = require('async');
 var express = require('express');
 var util = require('util');
+var narcutil = require('narcutil');
 var app = express();
 
 var INSTAGRAM_ACCESS_TOKEN = "2203667027.0b2763d.0855e602c01c4de49ab037f52f771ad1";
@@ -43,6 +44,8 @@ function testfn() {
     getOptimalTrip(userParams, cb);
 }
 
+console.log(narcutil.getCountryName('KY'));
+
 //testfn();
 
 function getUserParams(req) {
@@ -63,7 +66,10 @@ function getOptimalTrip(userParams, sendTopLocations) {
         })
         async.map(amadeus_params.results, calculateLocationScore,
             function(err, locationsWithScores) {
-                console.log(err);
+            	if (err) {
+            		console.log("Error occurred in getOptimalTrip");
+            	    return sendTopLocations(err);
+            	}
                 sendTopLocations(locationsWithScores.sort(function(a,b) { return b.score - a.score}));
             });
     });
@@ -83,7 +89,12 @@ function getLocationsByBudget(userParams, returnLocations){
                 "&max_price=" + userParams.budget +
                 "&aggregation_mode=COUNTRY" +
                 "&apikey=" + AMADEUS_KEY,
-            function(err, response, body){
+            function(err, res, body){
+            	if (err || res.statusCode != 200) {
+            	   console.log("Status code: " + res.statusCode);
+            	    console.log(body);
+            	    return returnLocations(err);
+            	}
                 console.log("EEPEPP");
                 var amadeus_params = JSON.parse(body);
                 getCitiesFromAirports(amadeus_params, 0, function() {
@@ -109,15 +120,14 @@ function getCity(result, callback) {
 			iata_code, AMADEUS_KEY)
 	}, function (err, res, body) {
 		if (err || res.statusCode != 200) {
-			console.log("OH GEE");
-			console.log(err);
-			console.log("" + res.statusCode);
-			return callback(err);
+		    console.log("Status code: " + res.statusCode);
+		    console.log(body);
+		    return callback(err);
 		}
         var cityData = JSON.parse(body);
 		console.log("NAME IS " + JSON.parse(body).airports[0].city_name);
 		result.name = cityData.airports[0].city_name.replace(/\s+/g, '');
-		result.country = cityData.airports[0].country;
+		result.country = narcutil.getCountryName(cityData.airports[0].country);
 		if (result.country === 'US') {
 			result.state = cityData.airports[0].state;
 		}
@@ -133,12 +143,20 @@ function calculateLocationScore(location, returnLocationWithScore) {
     var unixTimeStamp = Date.parse(location.departure_date)/1000 - (365*24*3600)+1;
     getTagIdForDate(unixTimeStamp, function(err, maxTagId) {
         getRecentPostsByTag(location.name, maxTagId, function(err, posts) {
+        	if (err) {
+        		console.log("Error occurred in calculateLocationScore");
+        	    return returnLocationWithScore(err);
+        	}
+        	location.images = [];
             var sortedPosts = posts.sort(function(a,b) { return b.likes.count - a.likes.count; });
             var postsWithoutOutliers = sortedPosts.splice(Math.floor(sortedPosts.length/10), 
                                                           Math.ceil(sortedPosts.length*9/10));
             var totalLikes = 0;
             for(var i = 0; i < postsWithoutOutliers.length; i++){
                 totalLikes += postsWithoutOutliers[i].likes.count;
+                if (location.images.length < 6) {
+                	location.images.push(postsWithoutOutliers[i].images.standard_resolution.url);
+                }
             }
             var normalizedLikes = totalLikes/postsWithoutOutliers.length;
             location.score = normalizedLikes;
@@ -185,6 +203,7 @@ function getTagIdForDate(unixTimestamp, returnPosts) {
         returnPosts(null, JSON.parse(body)['data'][0]['id']);
     });
 }
+
 var server = app.listen(2020, function() {
     console.log("Listening on port 2020...");
 });
