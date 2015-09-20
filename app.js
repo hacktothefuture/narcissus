@@ -7,15 +7,15 @@ var app = express();
 var INSTAGRAM_ACCESS_TOKEN = "2203667027.0b2763d.0855e602c01c4de49ab037f52f771ad1";
 var AMADEUS_KEY = "Q76ryFVSqb5BE6pmBJw9YJtuWsSufclH";
 var blah = 0;
-app.get('/node/findtrip', function(request, response) {
-    var userParams = getUserParams(request);
+app.get('/node/findtrip', function(req, resp) {
+    var userParams = getUserParams(req);
     function sendTopLocations(locationsWithScores) {
-        response.send(locationsWithScores);
+        resp.send(locationsWithScores);
     }
     getOptimalTrip(userParams, sendTopLocations);
 });
 
-app.get('/', function(request, response) {
+app.get('/', function(req, response) {
     return 'Hello, World!';
 });
 
@@ -34,12 +34,13 @@ function testfn() {
 
 testfn();
 
-function getUserParams(request) {
+function getUserParams(req) {
+    console.log(req);
     return {
-        'departure_location' : request.params('departure_location'),
-        'depart_date' : request.params('depart_date'),
-        'return_date' : request.params('return_date'),
-        'budget' : request.params('budget')
+        'departure_location' : req.query.departure_location,
+        'depart_date' : req.query.depart_date,
+        'return_date' : req.query.return_date,
+        'budget' : req.query.budget
     };
 }
 //Main function to be called by frontend
