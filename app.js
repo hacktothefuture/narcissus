@@ -14,6 +14,11 @@ app.get('/node/findtrip', function(request, response) {
     }
     getOptimalTrip(userParams, sendTopLocations);
 });
+
+app.get('/', function(request, response) {
+    return 'Hello, World!';
+});
+
 function testfn() {
     var userParams = {
         'departure_location' : "BOS",
@@ -149,5 +154,5 @@ function getTagIdForDate(unixTimestamp, returnPosts) {
 }
 
 var server = app.listen(2020, function() {
-    console.log("Listening on port 80...");
+    console.log("Listening on port 2020...");
 });
