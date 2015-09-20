@@ -18,6 +18,14 @@ function findTrips() {
     });
 }
 
+function makeTable(data){
+
+}
+
+function drawMapStuff(data){
+
+}
+
 $( document ).ready(function() {
     // Bind event handlers
     $("#location").autocomplete({
