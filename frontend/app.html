@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>narcissus</title>
+  <title>Tripstagram</title>
   <style type="text/css">
       html, body { height: 100%; margin: 0; padding: 0; }
       #map { height: 100%; }
@@ -16,7 +16,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Narcissus</h1>
+    <h1>Tripstagram</h1>
     <div class="panel panel-primary">
       <div class="panel-heading">Find Trips</div>
       <div class="panel-body">
@@ -44,12 +44,14 @@
           </div>
           
           <button type="button" class="btn btn-default" id="btn-find-trips">Find Trips</button>
+          <img src="img/loading-small.gif" hidden id="loading-small">
         </form>
       </div>
     </div>
   </div>
 
-  <div class="container" id="map"></div>
+  <div class="container" id="map" style="height:33%">
+  </div>
 
   <div class="container">
     <div class="list-group" id="list-results">

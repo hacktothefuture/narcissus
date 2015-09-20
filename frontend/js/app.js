@@ -12,10 +12,15 @@ function findTrips() {
     var location = $("#location").val();
     var departureDate = $("#departure-date").val();
     var budget = $("#budget").val();
+    
+    $("#loading-small").show();
+    
+    $("#list-results").empty();
 
     var response = $.get("http://localhost:2020/node/findtrip?departure_location=" + location + "&depart_date=" + departureDate + "&budget=" + budget, 
         function(data) {
             //alert("data: " + JSON.stringify(data));
+            $("#loading-small").hide();
             makeTable(data);
             drawMapStuff(data);
             $('html, body').animate({
