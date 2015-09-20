@@ -10,7 +10,18 @@ var blah = 0;
 app.get('/node/findtrip', function(req, resp) {
     var userParams = getUserParams(req);
     function sendTopLocations(locationsWithScores) {
-        resp.send(locationsWithScores);
+    	var departure_location = {'destination' : userParams.departure_location};
+    	getCity(departure_location, function(err, result) {
+			var resultJson = {
+				'departure_lat' : result.lat,
+				'departure_lon' : result.lng,
+				'departure_country' : result.country,
+				'departure_state' : result.state,
+				'locations_with_scores' : locationsWithScores
+			}
+		    resp.send(resultJson);
+    	});
+    	
     }
     getOptimalTrip(userParams, sendTopLocations);
 });
@@ -32,7 +43,7 @@ function testfn() {
     getOptimalTrip(userParams, cb);
 }
 
-testfn();
+//testfn();
 
 function getUserParams(req) {
     console.log(req);
@@ -106,6 +117,10 @@ function getCity(result, callback) {
         var cityData = JSON.parse(body);
 		console.log("NAME IS " + JSON.parse(body).airports[0].city_name);
 		result.name = cityData.airports[0].city_name.replace(/\s+/g, '');
+		result.country = cityData.airports[0].country;
+		if (result.country === 'US') {
+			result.state = cityData.airports[0].state;
+		}
         result.lat = cityData.airports[0].location.latitude;
         result.lng = cityData.airports[0].location.longitude;
 		callback(null, result);
